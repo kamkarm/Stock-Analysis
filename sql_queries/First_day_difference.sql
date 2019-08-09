@@ -1,5 +1,5 @@
--- contains column with difference between row's closing stock price
--- and the closing stock price at the beginning of the year
+/* contains column with difference between row's closing stock price
+   and the closing stock price at the beginning of the year */
 SELECT 
 	symbol, 
 	open_day,
