@@ -11,64 +11,50 @@ Query is then plotted as a bar graph on matplotlib
 """
 
 import psycopg2
-import os
 import matplotlib.pyplot as plt
-
+import sys
+sys.path.append('../')
+import db
 
 if __name__ == "__main__":
-	dbname = 'postgres'
-	user = 'postgres'
-	host = os.environ.get('aws_host')
-	port = 5432
-	pw = os.environ.get('aws_pw')
-
-
+	con = db.connect()
+	cur = con.cursor()
 	try:
-		con = psycopg2.connect(dbname = dbname, 
-							   user = user, 
-							   host = host, 
-							   port = port,
-							   password = pw)
-	except:
-		print('Connection to Database Error')
-	else:
-		cur = con.cursor()
-		try:
-			cur.execute("""
+		cur.execute("""
+			SELECT 
+				symbol, 
+				count(*)
+			FROM (
 				SELECT 
-					symbol, 
-					count(*)
-				FROM (
-					SELECT 
-						symbol,
-				  		open_day,
-				  		percent_change,
-				  		RANK() OVER (
-					  		PARTITION BY open_day 
-					  		ORDER by percent_change
-					  		) AS rank
-				  	FROM stocks
-				  	WHERE percent_change > 0) AS sub
-				WHERE rank = 1
-				GROUP BY symbol
-							""")
-		except psycopg2.DatabaseError as error:
-			print(error)
-		else:
-			result = cur.fetchall()
-			
-			data = []
-			xTickMarks = []
+					symbol,
+			  		open_day,
+			  		percent_change,
+			  		RANK() OVER (
+				  		PARTITION BY open_day 
+				  		ORDER by percent_change
+				  		) AS rank
+			  	FROM stocks
+			  	WHERE percent_change > 0) AS sub
+			WHERE rank = 1
+			GROUP BY symbol
+						""")
+	except psycopg2.DatabaseError as error:
+		print(error)
+	else:
+		result = cur.fetchall()
+		
+		data = []
+		xTickMarks = []
 
-			for row in result:
-				data.append(row[1])
-				xTickMarks.append(row[0])
+		for row in result:
+			data.append(row[1])
+			xTickMarks.append(row[0])
 
-			plt.bar(xTickMarks,data)
-			plt.xlabel('Stock Symbol')
-			plt.ylabel('Largest Growth Count')
-			plt.title('Cumulative Count of Stock with Largest Growth per Day')
-			plt.show()
-		finally:
-			if con is not None:
-				con.close()
+		plt.bar(xTickMarks,data)
+		plt.xlabel('Stock Symbol')
+		plt.ylabel('Largest Growth Count')
+		plt.title('Cumulative Count of Stock with Largest Growth per Day')
+		plt.show()
+	finally:
+		if con is not None:
+			con.close()

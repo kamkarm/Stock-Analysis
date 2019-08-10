@@ -7,54 +7,42 @@ value at day X and 1/02/2019
 
 Query is then plotted on as a bar graph on matplotlib 
 """
-
 import psycopg2
-import os
 import matplotlib.pyplot as plt
+import sys
+sys.path.append('../')
+import db
 
 if __name__ == "__main__":
-	dbname = 'postgres'
-	user = 'postgres'
-	host = os.environ.get('aws_host')
-	port = 5432
-	pw = os.environ.get('aws_pw')
+	con = db.connect()
+	cur = con.cursor()
 	try:
-		con = psycopg2.connect(dbname = dbname, 
-							   user = user, 
-							   host = host, 
-							   port = port,
-							   password = pw)
-	except:
-		print('Connection to Database Error')
+		cur.execute("""
+			SELECT 
+				symbol, 
+				closed - FIRST_VALUE (closed) OVER (
+			   									PARTITION BY symbol 
+				   								ORDER BY open_day
+				   									) AS difference
+			FROM stocks
+					""")
+	except psycopg2.DatabaseError as error:
+		print(error)
 	else:
-		cur = con.cursor()
-		try:
-			cur.execute("""
-				SELECT 
-					symbol, 
-					closed - FIRST_VALUE (closed) OVER (
-				   									PARTITION BY symbol 
-					   								ORDER BY open_day
-					   									) AS difference
-				FROM stocks
-						""")
-		except psycopg2.DatabaseError as error:
-			print(error)
-		else:
-			result = cur.fetchall()
-			data = {'AAPL' : [], 'FB': [], 'GOOG': []}
+		result = cur.fetchall()
+		data = {'AAPL' : [], 'FB': [], 'GOOG': []}
 
-			for symbol, val in result:
-				data[symbol].append(val)
+		for symbol, val in result:
+			data[symbol].append(val)
 
-			xTickMarks = [i for i in range(len(data['AAPL']))]
+		xTickMarks = [i for i in range(len(data['AAPL']))]
 
-			for stock, vals in data.items():
-				plt.plot(xTickMarks,vals)
-				plt.xlabel('Days Since January 2nd 2019')
-				plt.ylabel('Current Day and January 2nd 2019 Stock Price Difference')
-				plt.title('Stock Growth from January 2nd 2019 per Day for ' + stock)
-				plt.show()			
-		finally:
-			if con is not None:
-				con.close()
+		for stock, vals in data.items():
+			plt.plot(xTickMarks,vals)
+			plt.xlabel('Days Since January 2nd 2019')
+			plt.ylabel('Current Day and January 2nd 2019 Stock Price Difference')
+			plt.title('Stock Growth from January 2nd 2019 per Day for ' + stock)
+			plt.show()			
+	finally:
+		if con is not None:
+			con.close()

@@ -10,51 +10,39 @@ Percent_change is caculated by:
 """
 
 import psycopg2
-import os
+import sys
+sys.path.append('../')
+import db
 
 
 if __name__ == "__main__":
-	dbname = 'postgres'
-	user = 'postgres'
-	host = os.environ.get('aws_host')
-	port = 5432
-	pw = os.environ.get('aws_pw')
+	con = db.connect()
+	cur = con.cursor()
 	try:
-		con = psycopg2.connect(dbname = dbname, 
-							   user = user, 
-							   host = host, 
-							   port = port,
-							   password = pw)
-	except:
-		print('Connection to Database Error')
-	else:
-		cur = con.cursor()
-		try:
-			cur.execute("""
-				ALTER TABLE stocks 
-				ADD COLUMN percent_change REAL
-						""")
+		cur.execute("""
+			ALTER TABLE stocks 
+			ADD COLUMN percent_change REAL
+					""")
 
-			cur.execute("""
-				UPDATE stocks
-				SET percent_change = sub.change
-				FROM (
-					SELECT 
-						symbol, 
-				   		open_day, 
-				   		(closed - LAG(closed, 1) OVER (
-													PARTITION BY symbol 
-													ORDER BY open_day
-													)) / closed * 100 AS change
-					FROM stocks) AS sub
-				WHERE 
-					stocks.symbol = sub.symbol 
-					AND stocks.open_day = sub.open_day
-						""")
-			con.commit()
-		except psycopg2.DatabaseError as error:
-			print(error)
-			print('percent_change was not created')
-		finally:
-			if con is not None:
-				con.close()
+		cur.execute("""
+			UPDATE stocks
+			SET percent_change = sub.change
+			FROM (
+				SELECT 
+					symbol, 
+			   		open_day, 
+			   		(closed - LAG(closed, 1) OVER (
+												PARTITION BY symbol 
+												ORDER BY open_day
+												)) / closed * 100 AS change
+				FROM stocks) AS sub
+			WHERE 
+				stocks.symbol = sub.symbol 
+				AND stocks.open_day = sub.open_day
+					""")
+		con.commit()
+	except psycopg2.DatabaseError as error:
+		print(error)
+	finally:
+		if con is not None:
+			con.close()
