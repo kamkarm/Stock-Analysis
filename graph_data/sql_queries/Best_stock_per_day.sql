@@ -1,8 +1,7 @@
 -- Returns stock with largest percent change of the day if > 0
 SELECT 
 	symbol, 
-	open_day, 
-    percent_change
+	count(*)
 FROM (
 	SELECT 
 		symbol,
@@ -15,3 +14,4 @@ FROM (
   	FROM stocks
   	WHERE percent_change > 0) AS sub
 WHERE rank = 1
+GROUP BY symbol

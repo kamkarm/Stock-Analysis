@@ -17,15 +17,7 @@ if __name__ == "__main__":
 	con = db.connect()
 	cur = con.cursor()
 	try:
-		cur.execute("""
-			SELECT 
-				symbol, 
-				closed - FIRST_VALUE (closed) OVER (
-			   									PARTITION BY symbol 
-				   								ORDER BY open_day
-				   									) AS difference
-			FROM stocks
-					""")
+		cur.execute(open('sql_queries/first_day_difference.sql').read())
 	except psycopg2.DatabaseError as error:
 		print(error)
 	else:

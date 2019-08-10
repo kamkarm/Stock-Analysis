@@ -12,15 +12,7 @@ if __name__ == "__main__":
 	con = db.connect()
 	cur = con.cursor()
 	try:
-		cur.execute("""
-			SELECT 
-				symbol,
-				SUM(volume) OVER (
-								PARTITION BY symbol 
-								ORDER BY open_day
-								) AS total_trades
-			FROM stocks
-					""")
+		cur.execute(open('sql_queries/rolling_cumulative_volume.sql').read())
 	except psycopg2.DatabaseError as error:
 		print(error)
 	else:

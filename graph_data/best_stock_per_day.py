@@ -20,24 +20,7 @@ if __name__ == "__main__":
 	con = db.connect()
 	cur = con.cursor()
 	try:
-		cur.execute("""
-			SELECT 
-				symbol, 
-				count(*)
-			FROM (
-				SELECT 
-					symbol,
-			  		open_day,
-			  		percent_change,
-			  		RANK() OVER (
-				  		PARTITION BY open_day 
-				  		ORDER by percent_change
-				  		) AS rank
-			  	FROM stocks
-			  	WHERE percent_change > 0) AS sub
-			WHERE rank = 1
-			GROUP BY symbol
-						""")
+		cur.execute(open('sql_queries/best_stock_per_day.sql').read())
 	except psycopg2.DatabaseError as error:
 		print(error)
 	else:
