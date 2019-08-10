@@ -26,7 +26,6 @@ if __name__ == "__main__":
 		con.commit()
 	except psycopg2.DatabaseError as error:
 		print(error)
-		print('Table was not created')
 	finally:
 		if con is not None:
 			con.close()
