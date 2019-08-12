@@ -10,8 +10,8 @@ In this project, I:
 2. Analayzed the data using window functions and plots
 3. Scheduled an AWS lambda cron function to add latest stock prices daily to database
 
-load_data in the initialize_table folder will create and populate a table called stocks
-Each script in the graph_data folder will plot each of the graphs (graphs located in graphs folder)
+load_data in the initialize_table folder will create and populate a table called stocks.
+Each script in the graph_data folder will plot each of the graphs (graphs located in graphs folder).
 aws_lambda folder has the deployment_package zip file to run a scheduled lambda cron function, and screenshots of my lambda function on AWS.
 
 Data was acquired the Financial Modeling Prep API through:
