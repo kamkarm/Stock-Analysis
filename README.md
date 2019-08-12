@@ -8,7 +8,7 @@ In this project, I:
 
 1. Pulled historical data from a financial stocks API and loaded the data into an AWS RDS PostgreSQL table
 2. Analayzed the data using window functions and plots
-3. Scheduled an AWS lambda cron function to add latest stock prices daily
+3. Scheduled an AWS lambda cron function to add latest stock prices daily to database
 
 Data was acquired the Financial Modeling Prep API through:
 
