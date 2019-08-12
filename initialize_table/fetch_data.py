@@ -6,7 +6,7 @@ Data is acquired through the Financial Modeling Prep API
 
 import requests
 
-def load_2019_data():
+def fetch_2019_data():
 
 	#Connect to API and get historical data from January 1st 2019 - current date
 	url = 'https://financialmodelingprep.com/api/v3/historical-price-full/AAPL,GOOG,FB'
