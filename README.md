@@ -12,9 +12,9 @@ In this project, I:
 
 load_data in the initialize_table folder will create and populate a table called stocks.
 Each script in the graph_data folder will plot each of the graphs (graphs located in graphs folder).
-aws_lambda folder has the deployment_package zip file to run a scheduled lambda cron function, and screenshots of my lambda function on AWS.
+aws_lambda folder has the deployment_package zip file to run a scheduled lambda cron function and screenshots of my lambda function on AWS.
 
-Data was acquired the Financial Modeling Prep API through:
+Data was acquired through the Financial Modeling Prep API:
 
 https://financialmodelingprep.com/developer/docs/#Stock-Price
 
